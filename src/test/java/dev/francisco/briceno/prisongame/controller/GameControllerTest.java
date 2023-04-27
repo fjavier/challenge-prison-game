@@ -1,11 +1,17 @@
 package dev.francisco.briceno.prisongame.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.francisco.briceno.prisongame.dto.MazeDto;
+import dev.francisco.briceno.prisongame.dto.PrisonerSummaryResponseDto;
+import dev.francisco.briceno.prisongame.service.MazeService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -18,7 +24,9 @@ import java.util.List;
 @AutoConfigureMockMvc
 class GameControllerTest {
 
-    private static final String URL = "/prisoner";
+    private static final String URL_CANSCAPE_ENDPOINT = "/prisoner";
+
+    private static final String URL_STATUS_ENDPOINT = "/stats";
     private static final String[] MAZE1 = {"||||||S||", "|P ||   |", "||  | | |", "|v| | < |", "| |   | |",
             "|   |   |", "|||||||||"};
 
@@ -28,6 +36,9 @@ class GameControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private MazeService mazeService;
 
     @Test
     void canScape_shouldReturnOk() throws Exception {
@@ -39,7 +50,7 @@ class GameControllerTest {
         String request = objectMapper.writeValueAsString(mazeDtoRequest);
 
         mockMvc.perform(MockMvcRequestBuilders
-                .post(URL)
+                .post(URL_CANSCAPE_ENDPOINT)
                 .content(request)
                 .contentType(MediaType.APPLICATION_JSON)
         ).andDo(MockMvcResultHandlers.print())
@@ -57,7 +68,7 @@ class GameControllerTest {
         String request = objectMapper.writeValueAsString(mazeDtoRequest);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .post(URL)
+                        .post(URL_CANSCAPE_ENDPOINT)
                         .content(request)
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(MockMvcResultHandlers.print())
@@ -70,10 +81,27 @@ class GameControllerTest {
         String request = objectMapper.writeValueAsString(mazeDtoRequest);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .post(URL)
+                        .post(URL_CANSCAPE_ENDPOINT)
                         .content(request)
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void getStatus_shouldReturnValidResponse() throws Exception {
+        PrisonerSummaryResponseDto summary = PrisonerSummaryResponseDto
+                .builder()
+                .countUnsuccessfulScape(100)
+                .countSuccesfulScape(40)
+                .ratio(0.28).build();
+
+        Mockito.when(mazeService.getPrisonerSummary()).thenReturn(summary);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(URL_STATUS_ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }

@@ -1,6 +1,7 @@
 package dev.francisco.briceno.prisongame.controller;
 
 import dev.francisco.briceno.prisongame.dto.MazeDto;
+import dev.francisco.briceno.prisongame.dto.PrisonerSummaryResponseDto;
 import dev.francisco.briceno.prisongame.service.MazeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,5 +22,11 @@ public class GameController {
         if(!mazeService.canEscape(maze.getPrison())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/stats")
+    public PrisonerSummaryResponseDto stats(){
+        return mazeService.getPrisonerSummary();
     }
 }
