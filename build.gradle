@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
     id 'org.springframework.boot' version '3.0.6'
     id 'io.spring.dependency-management' version '1.1.0'
 }
@@ -25,5 +26,28 @@ dependencies {
 }
 
 tasks.named('test') {
+    finalizedBy jacocoTestReport
     useJUnitPlatform()
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        // Can consume xml for automation
+        xml.required = true;
+        // And html for visual
+        html.required = true;
+    }
+    // Clean the report - don't look at coverage on dtos, configs or models
+    afterEvaluate {
+        classDirectories.from = files(classDirectories.files.collect {
+            fileTree(
+                    dir: it,
+                    exclude: [
+                            'dev/francisco/briceno/prisongame/domain/*',
+                            'dev/francisco/briceno/prisongame/dto/*',
+                            'dev/francisco/briceno/prisongame/repository/*',
+                            'dev/francisco/briceno/prisongame/PrisonGameApplication.class', ])
+        })
+    }
 }

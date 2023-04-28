@@ -1,12 +1,10 @@
 package dev.francisco.briceno.prisongame.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.francisco.briceno.prisongame.dto.MazeDto;
 import dev.francisco.briceno.prisongame.dto.PrisonerSummaryResponseDto;
 import dev.francisco.briceno.prisongame.service.MazeService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,8 +25,7 @@ class GameControllerTest {
     private static final String URL_CANSCAPE_ENDPOINT = "/prisoner";
 
     private static final String URL_STATUS_ENDPOINT = "/stats";
-    private static final String[] MAZE1 = {"||||||S||", "|P ||   |", "||  | | |", "|v| | < |", "| |   | |",
-            "|   |   |", "|||||||||"};
+    private static final String[] MAZE1 = {"||||||S||", "|P ||   |", "||  | | |", "|v| | < |", "| |   | |","|   |   |", "|||||||||"};
 
     private static final String[] MAZE2 = {"| | | | | | |","| P |v| | S |","|   | | | | |","|||   | | | |"};
 
@@ -48,6 +45,7 @@ class GameControllerTest {
         mazeDtoRequest.setPrison(prisonStructure);
 
         String request = objectMapper.writeValueAsString(mazeDtoRequest);
+        Mockito.when(mazeService.canEscape(Mockito.anyList())).thenReturn(true);
 
         mockMvc.perform(MockMvcRequestBuilders
                 .post(URL_CANSCAPE_ENDPOINT)
