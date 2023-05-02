@@ -32,3 +32,12 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Build and push to docker
+      uses: mr-smithers-excellent/docker-build-push@v4
+      with:
+        image: fbricenos/prison-game:latest
+        registry: docker.io
+        username: ${{ secrets.DOCKER_ID }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+
