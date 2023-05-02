@@ -35,7 +35,8 @@ jobs:
     - name: Build and push to docker
       uses: mr-smithers-excellent/docker-build-push@v4
       with:
-        image: fbricenos/prison-game:latest
+        image: fbricenos/prison-game
+        tags: v1.0.0, latest
         registry: docker.io
         username: ${{ secrets.DOCKER_ID }}
         password: ${{ secrets.DOCKER_PASSWORD }}
